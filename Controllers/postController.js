@@ -2,6 +2,13 @@ const postModel =require('../Model/post')
 const userModel = require('../Model/user')
 
 exports.getPosts=(req,res,next)=>{
+  postModel.find({}).populate("userId").then((data)=>{
+    console.log(data);
+    
+    res.status(201).json({message:"success",data:data});
+}).catch((error)=>{
+  next(error);
+});
   
 }
 exports.getPostsById=async(req,res,next)=>{

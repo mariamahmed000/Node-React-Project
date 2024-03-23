@@ -3,13 +3,33 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
 exports.getUers=(req,res,next)=>{
-  console.log("getUers");
-  res.json("getUers")
-}
-exports.getUserById=(req,res,next)=>{
-  res.json("getUserById")
   
+  userModel.find({}).then((data)=>{
+    if(!data) {
+      res.status(404).json({message:"Not Have User"});
+    }else{
+      res.status(200).json({message:"sucess",data})
+    }
+  }).catch((err)=>{
+    next(err);
+  })
 }
+
+
+exports.getUserById=(req,res,next)=>{
+  const id=req.params.id;
+  userModel.findById({_id:id}).then((data)=>{
+    if(!data) {
+      res.status(404).json({message:"Not Have User"});
+    }else{
+      res.status(200).json({message:"sucess",data})
+    }
+  }).catch((err)=>{
+    next(err);
+  })
+}
+
+
 exports.Register=async(req,res,next)=>{
   try{
     const existingUser = await userModel.findOne({ email: req.body.email });
@@ -99,17 +119,115 @@ exports.Login=(req,res,next)=>{
         console.log(token);
       }
 
-      res.status(200).json({ data,token});
+      res.status(200).json({ message:"success",data,token});
     }
   })
     
 
 }
+
+
 exports.deleteUser=(req,res,next)=>{
-  res.json("deleteUser")
+  try{
+
+    const id =req.params.id;
+    userModel.findByIdAndDelete({_id:id}).then((data)=>{
+       if(!data){
+        res.status(404).json({message:"Not have this User with This ID"})
+       }else{
+        res.status(200).json({message:"success",data})
+       }
+    })
+  }catch(err){
+    next(err);
+  }
+}
+
+
+exports.updateUser=(req,res,next)=>{
+  const id=req.params.id;
+  const data=req.body;
+
+  userModel.findByIdAndUpdate({_id:id},{
+    $set:{
+      firstName:data.firstName,
+      lastName:data.lastName,
+      email:data.email,
+      password:data.password,
+      userImage:data.userImage,
+      location:data.location,
+    }
+  })
+  .then((data)=>{
+    res.status(200).json({message:"success",data});
+  })
+  .catch((error)=>{
+    res.json({message:"enter valid user id"})
+  });
 
 }
-exports.updateUser=(req,res,next)=>{
-  res.json("updateUser")
 
+exports.getUserFriends =async(req,res,next)=>{
+
+  try{
+
+    const id=req.params.id;
+    ////find the user
+    const user =await userModel.findById({_id:id});
+
+    ///get array of friends
+    const  friends =await Promise.all(
+      user.friends.map((id)=>userModel.findById({_id:id}))
+    );
+
+    const formattedFriends = friends.map(
+      ({ _id, firstName, lastName, location, userImage }) => {
+        return { _id, firstName, lastName, location, userImage };
+      }
+    );
+
+    res.status(200).json({message:"success",data:formattedFriends})
+
+  }catch(error){
+    res.status(404).json({message:error.message})
+  }
+}
+
+exports.toggleAddRemoveFriend =async(req,res,next)=>{
+
+  try{
+    const {id,friendId}=req.params;
+    
+    //get user and friend data
+    const user = await userModel.findById(id);
+    const friend = await userModel.findById(friendId);
+
+    ///toggle friend
+    if (user.friends.includes(friendId)) {
+      user.friends = user.friends.filter((id) => id !== friendId);
+      friend.friends = friend.friends.filter((id) => id !== id);
+    } else {
+      user.friends.push(friendId);
+      friend.friends.push(id);
+    }
+
+    await user.save();
+    await friend.save();
+
+      ///get array of friends
+    const friends = await Promise.all(
+      user.friends.map((id) => userModel.findById({_id:id}))
+    );
+    const formattedFriends = friends.map(
+      ({ _id, firstName, lastName, occupation, location, picturePath }) => {
+        return { _id, firstName, lastName, occupation, location, picturePath };
+      }
+    );
+
+    res.status(200).json(formattedFriends);
+
+  }
+  catch(error){
+    res.status(404).json({ message: err.message });
+  }
 }
