@@ -13,6 +13,8 @@ module.exports = (request, response, next) => {
     next(error);
   }
   if (encode !== undefined) { 
+    // console.log("encode.email",encode.email);
+    request.email=encode.email;
     request.role = encode.role;
     next();
   }

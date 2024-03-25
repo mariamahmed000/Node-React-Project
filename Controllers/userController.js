@@ -1,4 +1,5 @@
-const userModel =require("../Model/user")
+const userModel =require("../Model/user");
+const postModel =require('../Model/post')
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
@@ -118,7 +119,6 @@ exports.Login=(req,res,next)=>{
         );
         console.log(token);
       }
-
       res.status(200).json({ message:"success",data,token});
     }
   })
@@ -231,3 +231,5 @@ exports.toggleAddRemoveFriend =async(req,res,next)=>{
     res.status(404).json({ message: err.message });
   }
 }
+
+

@@ -10,7 +10,7 @@ const auth = require('../MiddelWare/auth')
 
 
 router.route('/post')
-.get(postController.getPosts)
+.get(auth,postController.getAllHomePosts)
 .post(postController.addPost);
 
 router.route('/post/:id')
@@ -19,12 +19,14 @@ router.route('/post/:id')
 .delete(postController.deletePost);
 
 router.route('/post/:id/like')
-.put(likesController.putLikesofPostById);
+.put(auth,likesController.putLikesofPostById);
 
 router.route('/post/:id/comment')
 .put(commentsController.putCommentsOfPostById)
-.get(commentsController.getComments);
-// .delete(postController.deletePost);
+.get(commentsController.getComments)
+
+router.route('/post/:id/:commentId')
+.delete(auth,commentsController.deleteComments);
 
 module.exports=router
 

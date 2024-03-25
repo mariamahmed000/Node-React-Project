@@ -58,3 +58,44 @@ exports.getComments = async (req, res) => {
     res.status(500).json({ message: 'Error: ' + error });
 }
 }
+
+
+exports.deleteComments = async (req, res) => {
+    try {
+
+      const {id,commentId}=req.params;
+
+      const post = await postModel.findById(id);
+      const comments = post.comments;
+      const userPost=post.userId;
+      const userEmail =req.email;
+      const userLogin = await userModel.find({email:userEmail});
+      
+
+      comments.forEach(async(com)=>{
+        if(com.userId.toString() === userLogin[0]._id.toString() || userLogin[0]._id.toString() === userPost.toString()){  
+          const commentIndex = comments.findIndex((comment)=>comment._id.toString() === commentId);
+          if (commentIndex !== -1) {
+          comments.splice(commentIndex,1);
+          }
+
+        }
+      });
+
+
+      postModel.findByIdAndUpdate(id,{
+        $set:{
+          comments:comments
+        }
+      }).then((data)=>{
+
+        res.status(200).json({message:"success",data:data})
+      }).catch((error)=>{
+        res.json({message:error.message})
+      });
+
+    
+} catch (error) {
+  res.json({message:error.message})
+}
+}

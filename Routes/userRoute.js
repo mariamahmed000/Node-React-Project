@@ -17,4 +17,6 @@ router.route("/user/:id")
 router.route("/user/:id/friends").get(auth,userController.getUserFriends);
 router.route("/user/:id/:friendId").put(auth,userController.toggleAddRemoveFriend);
 
+// router.route("/userimp").put(auth,userController.updateImpression)
+
 module.exports=router

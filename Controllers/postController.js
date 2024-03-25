@@ -12,6 +12,32 @@ exports.getPosts=async(req,res)=>{
     res.status(500).json({message:'Error: ' + error});
   }
 }
+
+exports.getAllHomePosts=async(req,res)=>{
+try{
+
+  const userEmail =req.email;
+  const user = await userModel.findOne({email:userEmail});
+  let allPosts =[];
+  const posts= await Promise.all(user.friends.map(async(id)=>{
+    const data= await getPostsUser(id);
+    console.log("data",data);
+    if(data.length!=0){allPosts.push(...data);}
+  }));
+  console.log("allposts",allPosts);
+  res.status(200).json({message:"success",data:allPosts})
+}catch(e){
+  res.status(404).json({message:e.message})
+
+}
+
+}
+
+const getPostsUser= async(id)=>{
+  const posts = await postModel.find({userId : id}).populate('userId')
+  return posts;
+}
+
 exports.getPostsById = async(req,res)=>{
   try{
     console.log(req.params)
@@ -38,7 +64,7 @@ exports.addPost=async(req,res,next)=>{
       description:data.description,
       postImage: data.postImage,
       likes: {},
-      comments: {},
+      comments: [],
     });
     console.log(newPost);
     await newPost.save();
