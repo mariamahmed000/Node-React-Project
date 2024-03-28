@@ -19,6 +19,8 @@ try{
   const userEmail =req.email;
   const user = await userModel.findOne({email:userEmail});
   let allPosts =[];
+  const data= await getPostsUser(user._id);
+  if(data.length!=0){allPosts.push(...data);}
   const posts= await Promise.all(user.friends.map(async(id)=>{
     const data= await getPostsUser(id);
     console.log("data",data);
@@ -40,13 +42,13 @@ const getPostsUser= async(id)=>{
 
 exports.getPostsById = async(req,res)=>{
   try{
-    console.log(req.params)
-    const userId = req.params.id;
-    const user = await userModel.findById(userId);
+
+    const userEmail =req.email;
+    const user = await userModel.findOne({email:userEmail});
     if(!user){
       return res.status(404).json({message:"User not found"});
     }
-    const posts = await postModel.find({userId : userId})
+    const posts = await postModel.find({userId : user._id})
     res.status(200).json({posts});
 
   }catch(error){
@@ -58,9 +60,11 @@ exports.getPostsById = async(req,res)=>{
 exports.addPost=async(req,res,next)=>{
   try{
     const data=req.body;
+    const userEmail =req.email;
+    const user = await userModel.findOne({email:userEmail});
     // add new post //
     const newPost = new postModel({
-      userId:data.userId,
+      userId:user._id,
       description:data.description,
       postImage: data.postImage,
       likes: {},
@@ -70,12 +74,16 @@ exports.addPost=async(req,res,next)=>{
     await newPost.save();
 
     // get all posts //
-    postModel.find({}).populate("userId").then((data)=>{
-        console.log(data);
-        res.status(201).json({message:"success",data:data});
-    }).catch((error)=>{
-      next(error);
-    })
+    let allPosts =[];
+    const posts= await Promise.all(user.friends.map(async(id)=>{
+      const data= await getPostsUser(id);
+      console.log("data",data);
+      if(data.length!=0){allPosts.push(...data);}
+    }));
+    const postData= await getPostsUser(user._id);
+    if(postData.length!=0){allPosts.push(...postData);}
+  console.log("allposts",allPosts);
+  res.status(200).json({message:"success",data:allPosts})
   }catch (err) {
     res.status(409).json({ message: err.message });
   }
@@ -102,6 +110,8 @@ exports.updatePost= async(req,res)=>{
     res.status(500).json({message: err.message});
   }
 }
+
+
 exports.deletePost=async(req,res)=>{
   try{
     const postId = req.params.id;

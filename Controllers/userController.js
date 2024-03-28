@@ -33,8 +33,25 @@ exports.getUserById=(req,res,next)=>{
 
 exports.Register=async(req,res,next)=>{
   try{
+    console.log("isgoogle",req.body.isGoogle);
+    const isGoogle = req.body.isGoogle;
     const existingUser = await userModel.findOne({ email: req.body.email });
-    if (existingUser) {
+
+    ///google
+    if(isGoogle && existingUser){
+      token=jwt.sign(
+        {
+          email:req.body.email,
+          role:"user",
+        },
+        "cmsam",
+        {expiresIn:"2hr"}
+      );
+
+      return res.status(200).json({message:"success",data:existingUser,token})
+    }
+
+     if (existingUser) {
       return res.status(400).json({ message: "Email already exists" });
     }
     let user = userModel({
@@ -42,7 +59,7 @@ exports.Register=async(req,res,next)=>{
       lastName:req.body.lastName,
       email:req.body.email,
       password:req.body.password,
-      userImage:req.body.userImage,
+      userImage:req.body.userImage||"https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png",
       friends:[],
       location:req.body.location,
       viewedProfile:0,
@@ -77,7 +94,7 @@ exports.Register=async(req,res,next)=>{
   }
   catch(err){
     console.log(err);
-    res.status(500).json({message});
+    res.status(500).json({message:err.message});
   }
 
 }

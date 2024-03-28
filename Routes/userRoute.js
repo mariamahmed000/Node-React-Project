@@ -8,7 +8,7 @@ const auth = require('../MiddelWare/auth');
 router.route("/register").post(userController.Register);
 router.route("/login").post(userController.Login);
 
-router.route("/user").get(auth,userController.getUers);
+router.route("/user").get(userController.getUers);
 router.route("/user/:id")
 .get(auth,userController.getUserById)
 .put(auth,userController.updateUser)
