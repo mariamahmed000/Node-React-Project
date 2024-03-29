@@ -59,7 +59,7 @@ exports.Register=async(req,res,next)=>{
       lastName:req.body.lastName,
       email:req.body.email,
       password:req.body.password,
-      userImage:req.body.userImage||"https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png",
+      userImage:req.body.userImage||"defultProfile.png",
       friends:[],
       location:req.body.location,
       viewedProfile:0,
@@ -109,8 +109,8 @@ exports.Login=(req,res,next)=>{
     }else{
 
       ///////bcrypt password compare
-      // var passwordValid = await bcrypt.compare(req.body.password,data.password);
-      // if(!passwordValid) return res.status(404).send("Invalid Email Or Password");
+      var passwordValid = await bcrypt.compare(req.body.password,data.password);
+      if(!passwordValid) return res.status(404).send("Invalid Email Or Password");
       
       ////////assign token
       let token;

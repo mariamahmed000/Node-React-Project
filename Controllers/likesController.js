@@ -24,7 +24,7 @@ exports.putLikesofPostById =async (req ,res)=>{
             {
             new:true
             }
-        );
+        ).populate('userId');
         updateImpression(post)
         res.status(200).json({updatedPost});
     }catch(e){
