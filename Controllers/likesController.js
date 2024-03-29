@@ -20,11 +20,16 @@ exports.putLikesofPostById =async (req ,res)=>{
           // console.log("userId[0]._id.toString()",userId[0]._id.toString());
             post.likes.set(userId[0]._id.toString(),true);
         }
-        const updatedPost = await postModel.findByIdAndUpdate(postId, {likes:post.likes},
+        const updatedPost = await postModel
+          .findByIdAndUpdate(
+            postId,
+            { likes: post.likes },
             {
-            new:true
+              new: true,
             }
-        ).populate('userId');
+          )
+          .populate("userId");
+        
         updateImpression(post)
         res.status(200).json({updatedPost});
     }catch(e){
@@ -38,11 +43,11 @@ exports.putLikesofPostById =async (req ,res)=>{
 const updateImpression =async(post)=>{
 
   const userLogin = await userModel.findById({_id:post.userId});
-  console.log("userLogin",userLogin);
+//   console.log("userLogin",userLogin);
   const posts = await postModel.find({userId:userLogin._id});
   console.log("posts",posts);
   const totalImp=posts.reduce((total,current)=>total+(current.likes.size),0)
-  console.log("totalImp",totalImp);
+//   console.log("totalImp",totalImp);
   const update =await userModel.updateOne({_id:userLogin._id},{$set:{impressions:totalImp}});
   // res.json(update)
 }
