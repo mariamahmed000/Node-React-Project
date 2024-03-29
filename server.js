@@ -11,25 +11,8 @@ const userRouter =require('./Routes/userRoute')
 const postRouter =require('./Routes/postRoute')
 const postController =require('./Controllers/postController')
 const auth = require('./MiddelWare/auth')
-
-const { Server } = require("socket.io");
-
-
-const io = new Server({
-  cors:{
-    origin:"http://localhost:3000"
-  }
-});
-
-
-io.on("connection", (socket) => {
-  console.log("someone login ");
-
-  socket.on("disconnect",()=>{
-    console.log("someone left");
-  })
-});
-
+const chatRouter =require('./Routes/chatRoute')
+const messageRouter =require('./Routes/messageRoute')
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -41,7 +24,7 @@ const storage = multer.diskStorage({
     cb(null, "public/assets");
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + "_" + file.originalname);
+    cb(null,file.originalname);
 
   },
 });
@@ -65,6 +48,8 @@ console.log('http://localhost:' + PORT);
 
 app.use(userRouter)
 app.use(postRouter)
+app.use(chatRouter)
+app.use(messageRouter)
 
 app.use((req, res) => {
   res.status(404).json({ message: "not found" });

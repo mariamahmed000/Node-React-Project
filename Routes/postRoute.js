@@ -13,6 +13,7 @@ router.route('/post')
 .get(auth,postController.getAllHomePosts)
 
 
+
 router.route('/post/:id')
 // .get(postController.getPostsById)
 .put(postController.updatePost)

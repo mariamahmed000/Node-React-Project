@@ -19,13 +19,13 @@ try{
   const userEmail =req.email;
   const user = await userModel.findOne({email:userEmail});
   let allPosts =[];
-  const data= await getPostsUser(user._id);
-  if(data.length!=0){allPosts.push(...data);}
   const posts= await Promise.all(user.friends.map(async(id)=>{
     const data= await getPostsUser(id);
     console.log("data",data);
     if(data.length!=0){allPosts.push(...data);}
   }));
+  const data= await getPostsUser(user._id);
+  if(data.length!=0){allPosts.push(...data);}
   console.log("allposts",allPosts);
   res.status(200).json({message:"success",data:allPosts})
 }catch(e){
@@ -43,12 +43,8 @@ const getPostsUser= async(id)=>{
 exports.getPostsById = async(req,res)=>{
   try{
 
-    const userEmail =req.email;
-    const user = await userModel.findOne({email:userEmail});
-    if(!user){
-      return res.status(404).json({message:"User not found"});
-    }
-    const posts = await postModel.find({userId : user._id}).populate("userId")
+    const userId = req.params.id;
+    const posts = await postModel.find({userId })
     res.status(200).json({posts});
 
   }catch(error){
