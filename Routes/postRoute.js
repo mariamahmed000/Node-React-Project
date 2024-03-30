@@ -15,7 +15,7 @@ router.route('/post')
 
 
 router.route('/post/:id')
-// .get(postController.getPostsById)
+.get(postController.getPostsById)
 .put(postController.updatePost)
 .delete(postController.deletePost);
 
