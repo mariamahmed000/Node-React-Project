@@ -4,8 +4,14 @@ exports.putCommentsOfPostById = async (req, res) => {
   try {
     const postId = req.params.id;
     const post = await postModel.findById(postId);
-    const { userId, userComment } = req.body;
-    post.comments.push({ userId, comment: userComment });
+    const userEmail = req.email;
+    console.log("user", userEmail);
+    const user = await userModel.findOne({ email: userEmail });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const { userComment } = req.body;
+    post.comments.push({ userId:user._id, comment: userComment });
     const updatedPost = await postModel.findByIdAndUpdate(
       postId,
       { comments: post.comments },

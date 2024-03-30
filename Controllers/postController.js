@@ -44,7 +44,7 @@ exports.getPostsById = async(req,res)=>{
   try{
 
     const userId = req.params.id;
-    const posts = await postModel.find({userId })
+    const posts = await postModel.find({userId }).populate("userId")
     res.status(200).json({posts});
 
   }catch(error){
