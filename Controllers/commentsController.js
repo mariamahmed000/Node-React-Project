@@ -42,6 +42,7 @@ exports.getComments = async (req, res) => {
               firstName: user.firstName,
               lastName: user.lastName,
               comment: comment.comment,
+              userImage: user.userImage
             }
           : null;
       })
