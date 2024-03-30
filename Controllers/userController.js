@@ -232,11 +232,11 @@ exports.toggleAddRemoveFriend = async (req, res, next) => {
 
     ///get array of friends
     const friends = await Promise.all(
-      user.friends.map((id) => userModel.findById({ _id: id }))
+      friend.friends.map((id) => userModel.findById({ _id: id }))
     );
     const formattedFriends = friends.map(
-      ({ _id, firstName, lastName, occupation, location, picturePath }) => {
-        return { _id, firstName, lastName, occupation, location, picturePath };
+      ({ _id, firstName, lastName, occupation, location, userImage }) => {
+        return { _id, firstName, lastName, occupation, location, userImage };
       }
     );
 
