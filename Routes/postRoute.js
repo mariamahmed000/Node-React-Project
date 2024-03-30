@@ -12,7 +12,7 @@ const auth = require('../MiddelWare/auth')
 router.route('/post')
 .get(auth,postController.getAllHomePosts)
 
-
+router.route("/allposts").get(postController.getPosts);
 
 router.route('/post/:id')
 .get(postController.getPostsById)
