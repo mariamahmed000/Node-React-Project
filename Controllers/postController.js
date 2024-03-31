@@ -61,7 +61,7 @@ exports.addPost=async(req,res,next)=>{
     // add new post //
     const newPost = new postModel({
       userId:user._id,
-      description:data.description+"ggg",
+      description:data.description,
       postImage: data.postImage,
       likes: {},
       comments: [],
