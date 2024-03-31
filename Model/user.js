@@ -50,7 +50,7 @@ const userShema = new mongoose.Schema({
       type:Number,
       default:0
     },
-})
+},{timestamps:true})
 
 
 userShema.pre("save", async function (next) {

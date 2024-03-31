@@ -191,22 +191,27 @@ exports.getUserFriends = async (req, res, next) => {
   try {
     const id = req.params.id;
     ////find the user
+    console.clear();
+    console.log({id})
+    // return
     const user = await userModel.findById({ _id: id });
 
     ///get array of friends
     const friends = await Promise.all(
-      user.friends.map((id) => userModel.findById({ _id: id }))
+      user.friends.map((id) => userModel.findOne({ _id: id }))
     );
-
-    const formattedFriends = friends.map(
+      console.log("MAZENNNNNNNNNNNNNNN", friends)
+    const formattedFriends = friends.filter(Boolean).map(
       ({ _id, firstName, lastName, location, userImage }) => {
         return { _id, firstName, lastName, location, userImage };
       }
     );
+    console.log("MARIAMMMMMMMMMMMMMMMMMMMMM", formattedFriends)
 
-    res.status(200).json({ message: "success", data: formattedFriends });
+    res.status(200).json({ message: "success", data: JSON.parse(JSON.stringify(formattedFriends)) });
   } catch (error) {
-    res.status(404).json({ message: error.message });
+    console.log(error)
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -226,6 +231,8 @@ exports.toggleAddRemoveFriend = async (req, res, next) => {
       user.friends.push(friendId);
       friend.friends.push(id);
     }
+    console.log("user.friends", user.friends);
+    console.log("friend.friends", friend.friends);
 
     await user.save();
     await friend.save();
@@ -234,14 +241,25 @@ exports.toggleAddRemoveFriend = async (req, res, next) => {
     const friends = await Promise.all(
       friend.friends.map((id) => userModel.findById({ _id: id }))
     );
-    const formattedFriends = friends.map(
+    const userFr = await Promise.all(
+      user.friends.map((id) => userModel.findById({ _id: id }))
+    );
+    const formattedFriends = friends
+      .filter(Boolean)
+      .map(({ _id, firstName, lastName, occupation, location, userImage }) => {
+        return { _id, firstName, lastName, occupation, location, userImage };
+      });
+    const formattedUserFriends = userFr.filter(Boolean).map(
       ({ _id, firstName, lastName, occupation, location, userImage }) => {
         return { _id, firstName, lastName, occupation, location, userImage };
       }
     );
 
-    res.status(200).json(formattedFriends);
+    res
+      .status(200)
+      .json({ user: formattedUserFriends, friend: formattedFriends });
   } catch (error) {
-    res.status(404).json({ message: err.message });
+    console.log(error)
+    res.status(500).json({ message: error.message });
   }
 };
