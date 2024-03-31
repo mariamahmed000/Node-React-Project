@@ -34,7 +34,7 @@ app.post("/post", auth, upload.single("image"), postController.addPost);
 
 
 mongoose
-	.connect(CONNECTION)
+	.connect("mongodb+srv://mariammemo445:g2C2gSfLgebDgWF1@cluster0.hyc4hf1.mongodb.net/worldwide?retryWrites=true&w=majority")
 	.then(data => {
 		app.listen(PORT, () => {
 			console.log('http://localhost:' + PORT);
