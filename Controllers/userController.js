@@ -111,36 +111,42 @@ exports.Login = (req, res, next) => {
     if (!data) {
       res.status(500).json({ message: "Email or Password not correct" });
     } else {
-      ///////bcrypt password compare
-      var passwordValid = await bcrypt.compare(req.body.password,data.password);
-      if(!passwordValid) return res.status(404).send("Invalid Email Or Password");
-      
-      ////////assign token
-      let token;
-      console.log(data);
-      if (data.email == "admin@gmail.com") {
-        token = jwt.sign(
-          {
-            email: data.email,
-            role: "admin",
-          },
-          "cmsam",
-          { expiresIn: "2hr" }
-        );
-        console.log(token);
-        // res.status(200).json({data,token})
-      } else {
-        token = jwt.sign(
-          {
-            email: data.email,
-            role: "user",
-          },
-          "cmsam",
-          { expiresIn: "2hr" }
-        );
-        console.log(token);
+      if(req.body.password != data.password){
+        return res.status(404).send("Invalid Email Or Password");
+      }else{
+
+        ////////assign token
+        let token;
+        console.log(data);
+        if (data.email == "admin@gmail.com") {
+          token = jwt.sign(
+            {
+              email: data.email,
+              role: "admin",
+            },
+            "cmsam",
+            { expiresIn: "2hr" }
+          );
+          console.log(token);
+          // res.status(200).json({data,token})
+        } else {
+          token = jwt.sign(
+            {
+              email: data.email,
+              role: "user",
+            },
+            "cmsam",
+            { expiresIn: "2hr" }
+          );
+          console.log(token);
+        }
+        res.status(200).json({ message: "success", data, token });
       }
-      res.status(200).json({ message: "success", data, token });
+      ///////bcrypt password compare
+      // console.log("req",req.body.password);
+      // var passwordValid = await bcrypt.compare(req.body.password,data.password);
+      // if(!passwordValid) return res.status(404).send("Invalid Email Or Password");
+      
     }
   });
 };

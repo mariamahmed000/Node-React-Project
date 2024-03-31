@@ -53,14 +53,14 @@ const userShema = new mongoose.Schema({
 },{timestamps:true})
 
 
-userShema.pre("save", async function (next) {
-  const salt = await bcrypt.genSalt();
-  // console.log(salt)
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
-});
-userShema.post("save", (document, next) => {
-  // console.log("created");
-  next();
-});
+// userShema.pre("save", async function (next) {
+//   const salt = await bcrypt.genSalt();
+//   // console.log(salt)
+//   this.password = await bcrypt.hash(this.password, salt);
+//   next();
+// });
+// userShema.post("save", (document, next) => {
+//   // console.log("created");
+//   next();
+// });
 module.exports=mongoose.model("User",userShema)
